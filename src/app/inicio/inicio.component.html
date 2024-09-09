@@ -1,10 +1,14 @@
 
+
 <div class="tetris-container">
   <div class="tetris-board">
     <div *ngFor="let row of board">
       <div *ngFor="let cell of row" class="tetris-cell"  [ngClass]="{'cellPieza': cell.filled==true}">
-        
+       
       </div>
     </div>
   </div>
 </div>
+
+
+

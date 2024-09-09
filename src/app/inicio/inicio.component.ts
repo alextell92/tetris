@@ -8,17 +8,58 @@ import { Component, HostListener } from '@angular/core';
 export class InicioComponent {
   board: { filled: boolean }[][];
   piecePosition: { x: number, y: number }[];
-  activePiece: number[][];
   intervalId: any; // Identificador del intervalo de temporizador
 
+  rows = 20;
+  columns = 10;
+  activePiece: number[][] = [
+    [1,1],
+    [1,1]
+  ];
+
   constructor() {
-    this.board = Array.from({ length: 20 }, () => Array.from({ length: 10 }, () => ({ filled: false })));
-    this.activePiece = [
-      [1, 1],  // Ejemplo de pieza en forma de bloque
-      [1, 1]
-    ];
-    this.piecePosition = [{ x: 0, y: 4 }]; // La pieza aparece en la fila superior, columna central
+    this.board = Array.from({ length: 10 }, () => Array.from({ length: 20 }, () => ({ filled: false })));
+ 
+    this.piecePosition = [
+      { y:0,x: 4 },
+      {y:0,x:5},  
+      {y:0,x:6},
+      {y:1,x:4}];// La pieza aparece en la fila superior, columna central
+
+     
+     
+ 
   }
+
+
+  piezas(){
+    const L = [
+      { y:0,x: 4 },
+      {y:0,x:5},  
+      {y:0,x:6},
+      {y:1,x:4}]; // La pieza aparece en la fila superior, columna central
+
+     const cuadro = [
+        { y:0,x: 4 },
+        {y:0,x:5},  
+        {y:1,x:5},
+        {y:1,x:4}]; // La pieza aparece en la fila superior, columna central
+  
+        
+    const l = [
+      { y:0,x: 4 },  
+      {y:1,x:4},
+      {y:2,x:4}]; // La pieza aparece en la fila superior, columna central
+
+      const Z = [
+        { y:0,x: 4 },
+        { y:0,x: 5},
+        {y:1,x:4},
+        {y:1,x:3}]; // La pieza aparece en la fila superior, columna central
+  
+
+  }
+
 
   ngOnInit() {
     this.startGame();
@@ -33,19 +74,24 @@ export class InicioComponent {
   // Inicia el juego
   startGame() {
     this.placePieceOnBoard();
-    this.intervalId = setInterval(() => {
-      this.movePiece(0, 1); // Mueve la pieza hacia abajo
-    }, 500); // Ajusta la velocidad aquí (milisegundos)
+    // this.intervalId = setInterval(() => {
+    //   this.movePiece(0, 1); // Mueve la pieza hacia abajo
+    
+    // }, 500); // Ajusta la velocidad aquí (milisegundos)
   }
 
   // Coloca la pieza en el tablero actualizando las celdas llenas
   placePieceOnBoard() {
     this.clearBoard();
     this.piecePosition.forEach(pos => {
-      if (this.isValidPosition(pos.x, pos.y)) {
-        this.board[pos.y][pos.x].filled = true;
+     
+      if (this.isValidPosition(pos.y, pos.x)) {
+        this.board[pos.x][pos.y].filled = true;
       }
+    
     });
+
+
   }
 
   // Limpia el tablero de la pieza actual
@@ -55,7 +101,7 @@ export class InicioComponent {
 
   // Verifica si la posición es válida
   isValidPosition(x: number, y: number): boolean {
-    return x >= 0 && x < 10 && y >= 0 && y < 20;
+    return x >= 0 && x < 10 && y >= 0 && y< 20;
   }
 
   // Listener para las teclas
@@ -72,6 +118,7 @@ export class InicioComponent {
         this.movePiece(0, 1);  // Mover hacia abajo
         break;
       case 'ArrowUp':
+        console.log("rotar")
         this.rotatePiece();    // Rotar la pieza
         break;
     }
@@ -79,8 +126,8 @@ export class InicioComponent {
 
   // Mueve la pieza
   movePiece(deltaX: number, deltaY: number) {
-    const newPosition = this.piecePosition.map(pos => ({ x: pos.x + deltaX, y: pos.y + deltaY }));
-    
+    const newPosition = this.piecePosition.map(pos => ({ y: pos.y + deltaY, x: pos.x + deltaX }));
+    console.log(newPosition)
     if (newPosition.every(pos => this.isValidPosition(pos.x, pos.y))) {
       this.piecePosition = newPosition;
       this.placePieceOnBoard();
@@ -89,16 +136,32 @@ export class InicioComponent {
 
   // Lógica simple para rotar la pieza (en este caso, rotación de matrices)
   rotatePiece() {
-    const size = this.activePiece.length;
-    let newPiece = Array.from({ length: size }, () => Array(size).fill(0));
-    
-    for (let i = 0; i < size; i++) {
-      for (let j = 0; j < size; j++) {
-        newPiece[i][j] = this.activePiece[size - j - 1][i];
-      }
+    // Obtener la forma rotada de la pieza
+    const rotatedShape = this.activePiece[0].map((i) =>
+      this.activePiece.map(row => row[i]).reverse()
+    );
+
+    const newPiece: { x: number, y: number }[] = [];
+
+    // Obtener la pieza rotada en términos de posiciones
+    const pivotX = this.piecePosition[0].x;
+    const pivotY = this.piecePosition[0].y;
+
+    this.piecePosition.forEach(pos => {
+      const newX = pivotX - (pos.y - pivotY);
+      const newY = pivotY + (pos.x - pivotX);
+      newPiece.push({ x: newX, y: newY });
+    });
+
+    // Verificar si la pieza rotada es válida
+    if (this.isValidPositionAfterRotation(newPiece)) {
+      this.piecePosition = newPiece;
+      this.placePieceOnBoard();
     }
-    
-    this.activePiece = newPiece;
-    // Aquí también debes ajustar las posiciones de la pieza actual
+  }
+
+  // Verifica si la pieza rotada es válida
+  isValidPositionAfterRotation(newPiece: { x: number, y: number }[]): boolean {
+    return newPiece.every(pos => this.isValidPosition(pos.x, pos.y));
   }
 }
