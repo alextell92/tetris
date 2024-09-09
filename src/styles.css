@@ -16,13 +16,13 @@
 
 /* Tablero de Tetris */
 .tetris-board {
-  display: grid;
-  grid-template-rows: repeat(20, 1fr);
-  grid-template-columns: repeat(10, 1fr);
-  gap: 0.1px;
-  width: 100%; /* Usa el 100% del contenedor padre */
-  max-width: 400px; /* Tamaño máximo para pantallas grandes */
-  aspect-ratio: 1 / 2; /* Proporción de ancho/alto correcta */
+    display: grid;
+    grid-template-rows: repeat(20, 1fr);
+    grid-template-columns: repeat(10, 1fr);
+    gap: 0.1px;
+    width: 100%; /* Usa el 100% del contenedor padre */
+    max-width: 400px; /* Tamaño máximo para pantallas grandes */
+  
 }
 
 
