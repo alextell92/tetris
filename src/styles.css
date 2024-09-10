@@ -1,46 +1,30 @@
-/* Reseteo global para evitar márgenes y padding por defecto */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Contenedor para centrar el tablero */
 .tetris-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Ocupa toda la altura de la ventana */
-  overflow: hidden; /* Asegura que no haya scroll extra */
+  height: 100vh;
 }
 
-/* Tablero de Tetris */
-.tetris-board {
-    display: grid;
-    grid-template-rows: repeat(20, 1fr);
-    grid-template-columns: repeat(10, 1fr);
-    gap: 0.1px;
-    width: 100%; /* Usa el 100% del contenedor padre */
-    max-width: 400px; /* Tamaño máximo para pantallas grandes */
-  
-}
-
-
-/* Celdas del Tetris */
-.tetris-cell {
-  background-color: #333;
-  border: 0.1px solid #ccc;
+.board {
+  display: grid;
+  grid-template-rows: repeat(20, 1fr);
+  grid-template-columns: repeat(10, 1fr);
   width: 100%;
-  height: 100%;
+  max-width: 400px; /* Máximo ancho para limitar el tamaño */
+  aspect-ratio: 1 / 2; /* Mantiene la proporción 1:2 (10x20) */
+  background-color: #000;
+  border: 2px solid #fff;
 }
 
-.cellPieza{
-  background-color: #2900f7;
+.row {
+  display: contents;
 }
 
-/* Hacer el tablero responsivo */
-@media (max-width: 600px) {
-  .tetris-board {
-    max-width: 90vw; /* Ajusta el tamaño del tablero para pantallas pequeñas */
-  }
+.cell {
+  border: 1px solid #333;
+  background-color: #000;
+}
+
+.cell.filled {
+  background-color: #00f;
 }
