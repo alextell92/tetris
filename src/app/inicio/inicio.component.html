@@ -16,9 +16,7 @@
   <div class="board">
     <div *ngFor="let row of board; let rowIndex = index" class="row">
       <div *ngFor="let cell of row; let colIndex = index" class="cell"
-        [ngClass]="{
-          'filled': cell !== 0 || isCurrentPiece(rowIndex, colIndex)
-        }">
+        [ngClass]="{'filled': cell !== 0 || ispiezaActual(rowIndex, colIndex)}">
       </div>
     </div>
   </div>
