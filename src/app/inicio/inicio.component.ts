@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-inicio',
@@ -6,6 +6,8 @@ import { Component, HostListener } from '@angular/core';
   styleUrl: './inicio.component.css'
 })
 export class InicioComponent {
+
+  @ViewChild('tecladoVirtual') tecladoV!: ElementRef;
   boardWidth = 10;  // 10 columnas
   boardHeight = 20; // 20 filas
   board: number[][] = [];
@@ -23,6 +25,8 @@ export class InicioComponent {
 
   caidaIntervalo: any;
   velocidadDeBajada = 500; // Velocidad de caída de las piezas (ms)
+  isPaused: boolean=false;
+
 
   ngOnInit(): void {
     this.tablero();//Llamada tablero
@@ -30,7 +34,10 @@ export class InicioComponent {
     this.iniciaGame();
   }
 
+  //Al alcer una modificacion en el tablero, este metodo se llama para actualizar la vista
   ispiezaActual(row: number, col: number): boolean {
+
+    
     for (let y = 0; y < this.piezaActual.pieza.length; y++) {
       for (let x = 0; x < this.piezaActual.pieza[y].length; x++) {
         if (
@@ -38,6 +45,7 @@ export class InicioComponent {
           this.piezaActual.y + y === row &&
           this.piezaActual.x + x === col
         ) {
+          
           return true;
         }
       }
@@ -105,20 +113,45 @@ export class InicioComponent {
     //Intervalo infinito de caida de piezas
   this.caidaIntervalo = setInterval(() => {
     this.iniciaBajada();
+    
 
   }, this.velocidadDeBajada);
 
 }
 
 
+ // Método para pausar el setInterval
+ pauseInterval() {
+  if (this.caidaIntervalo) {
+    clearInterval(this.caidaIntervalo);
+    this.isPaused = true;
+    this.caidaIntervalo = null;
+   // console.log('Intervalo pausado');
+  }
+}
+
+  // Método para reanudar el setInterval
+  resumeInterval() {
+    if (this.isPaused && !this.caidaIntervalo) {
+      this.iniciaGame();
+      this.isPaused = false;
+     // console.log('Intervalo reanudado');
+    }
+  }
+
+
 iniciaBajada() {
   //1: se va a mover una fila hacia abajo
   //0: no se movera ni izquierda ni derecha
+  console.log(this.revisarMovimiento(1, 0))
   if (this.revisarMovimiento(1, 0)) {
+    //Cuando se ha revisado qu ela pieza estara en una posicion valida, 
+    //Se incremenat 1 la cordenada y de la pieza, para que la pieza avance a la siguiente fila asi hasta encontrar una pieza en el tablero, o el fondo del tablero
     this.piezaActual.y += 1;
   } else {
-    //
+    //Cuando se detecta fin de tablero o colision con otra pieza, se coloca la pieza en su posicion final
     this.colocarPiezaTablero();
+    //Se genera otra pieza para comenzar el ciclo nuevamente
     this.seleccionarPieza();
   }
 }
@@ -180,6 +213,7 @@ Cuando y = 2 y x = 1, estás en el último bloque de la
 
         //Revisa si la nueva coordenada esta en los limites establecidos, para saber si llego al fondo, o si existe alguna otra pieza en la misma posicion, lo que
         //Indica que choco con otra pieza
+             //3           //20         5             5               10                    3    5
         if (newY >= this.boardHeight || newX < 0 || newX >= this.boardWidth || this.board[newY][newX] !== 0) {
           return false;
         }
@@ -192,13 +226,10 @@ Cuando y = 2 y x = 1, estás en el último bloque de la
 colocarPiezaTablero() {
   for (let y = 0; y < this.piezaActual.pieza.length; y++) {
     for (let x = 0; x < this.piezaActual.pieza[y].length; x++) {
-
+      //Revisa y coloca unicamente los campos 1 de la pieza en el tablero
       if (this.piezaActual.pieza[y][x] !== 0) {
-
-
-        this.board[this.piezaActual.y + y][this.piezaActual.x + x] = this.piezaActual.pieza[y][x];
-
-    
+        //La pieza llego al fondo del tablero o coliciona con otra pieza, se coloca en el tablero en su posicion final valida detectada.
+        this.board[this.piezaActual.y + y][this.piezaActual.x + x] = this.piezaActual.pieza[y][x];    
       }
     }
   }
@@ -207,10 +238,11 @@ colocarPiezaTablero() {
 
 rotarPieza(pieza: number[][]): number[][] {
   // Rotar la matriz en sentido horario
+  //se utiliza pieza[0] para obtener el número de columnas (o el tamaño de la primera fila) de la matriz pieza.
   return pieza[0].map((_, index) => pieza.map(row => row[index]).reverse());
 }
 
-canMoveRotated(rotatedShape: number[][]): boolean {
+verificaPosicionRotada(rotatedShape: number[][]): boolean {
   for (let y = 0; y < rotatedShape.length; y++) {
     for (let x = 0; x < rotatedShape[y].length; x++) {
       if (rotatedShape[y][x] !== 0) {
@@ -230,7 +262,7 @@ canMoveRotated(rotatedShape: number[][]): boolean {
 rotatepiezaActual() {
   const rotatedShape = this.rotarPieza(this.piezaActual.pieza);
   // Verificar si la rotación es válida antes de asignar
-  if (this.canMoveRotated(rotatedShape)) {
+  if (this.verificaPosicionRotada(rotatedShape)) {
     this.piezaActual.pieza = rotatedShape;
   }
 }
@@ -252,5 +284,53 @@ handleKeydown(event: KeyboardEvent) {
         break;
   }
 }
+
+
+eventosSimulaTeclas(tecla:string){
+  let event: any
+  switch(tecla){
+    case 'iz':
+
+     event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+    break;
+    case 'de':
+
+     event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+    break;
+    case 'ar':
+
+     event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+    break;
+    case 'ab':
+
+     event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+    break;
+
+
+  }
+  this.tecladoV.nativeElement.dispatchEvent(event);
+}
+
+
+ pantallaMobil(): boolean {
+  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+
+  // Verificar si el userAgent coincide con dispositivos móviles comunes
+  if (/android/i.test(userAgent)) {
+    return true;
+  }
+
+  if (/iPhone|iPad|iPod/i.test(userAgent)) {
+    return true;
+  }
+
+  if (/windows phone/i.test(userAgent)) {
+    return true;
+  }
+
+  // Si no coincide con ninguno, entonces no es un móvil
+  return false;
+}
+
 
 }

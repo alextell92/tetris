@@ -10,6 +10,9 @@
 </div>
 -->
 
+<button (click)="pauseInterval()">Pausar Intervalo</button>
+<button (click)="resumeInterval()">Reanudar Intervalo</button>
+
 
 
 <div class="tetris-container">
@@ -19,7 +22,29 @@
         [ngClass]="{'filled': cell !== 0 || ispiezaActual(rowIndex, colIndex)}">
       </div>
     </div>
+    
   </div>
+
+
+
 </div>
+<div *ngIf="pantallaMobil()" (keydown)="handleKeydown($event)" tabindex="0" #tecladoVirtual>
+ 
+
+
+
+
+<div class="container">
+  <button id="up" class="arrow up" (click)="eventosSimulaTeclas('ar')">▲</button>
+  <div class="horizontals">
+    <button id="left" class="arrow left" (click)="eventosSimulaTeclas('iz')">◄</button>
+    <button id="right" class="arrow right" (click)="eventosSimulaTeclas('de')" >►</button>
+  </div>
+  <button id="down" class="arrow down" (click)="eventosSimulaTeclas('ab')">▼</button>
+</div>
+</div>
+
+
+
 
 

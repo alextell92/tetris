@@ -28,3 +28,53 @@
 .cell.filled {
   background-color: rgb(9, 9, 189);
 }
+
+
+
+/* Estilos básicos para el cuerpo */
+body, html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* Coloca los elementos al final de la página */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centrar horizontalmente */
+  margin-bottom: 1px; /* Ajusta si necesitas más espacio desde abajo */
+}
+
+/* Para la fila de los botones izquierda y derecha */
+.horizontals {
+  display: flex;
+  justify-content: space-between;
+  width: 120px; /* Ajusta el ancho de acuerdo a la separación deseada */
+  margin: 10px 0;
+}
+
+.arrow {
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  text-align: center;
+  cursor: pointer;
+  background-color: lightgray;
+  border: 1px solid gray;
+  border-radius: 5px;
+}
+
+.arrow:hover {
+  background-color: gray;
+  color: white;
+}
+
+/* Opcional: Estilos adicionales para la posición de las flechas */
+.up, .down, .left, .right {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
